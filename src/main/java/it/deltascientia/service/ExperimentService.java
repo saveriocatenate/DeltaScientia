@@ -2,6 +2,7 @@ package it.deltascientia.service;
 
 import it.deltascientia.dto.ExperimentCreateRequest;
 import it.deltascientia.dto.ExperimentResponse;
+import it.deltascientia.dto.ResolvedVariable;
 import it.deltascientia.mapper.ExperimentMapper;
 import it.deltascientia.model.Experiment;
 import it.deltascientia.model.VariableType;

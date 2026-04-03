@@ -6,7 +6,7 @@ import it.deltascientia.dto.ExperimentTrialSummary;
 import it.deltascientia.dto.ExperimentVariableSummary;
 import it.deltascientia.model.Experiment;
 import it.deltascientia.model.Variable;
-import it.deltascientia.service.ResolvedVariable;
+import it.deltascientia.dto.ResolvedVariable;
 
 import java.util.List;
 

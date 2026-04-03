@@ -1,4 +1,4 @@
-package it.deltascientia.service;
+package it.deltascientia.dto;
 
 import it.deltascientia.model.VariableType;
 

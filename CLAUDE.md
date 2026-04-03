@@ -72,5 +72,5 @@ Source `openrouter.env` before running the application to load environment varia
 Active development phase. Core infrastructure in place:
 - Experiment CRUD with VariableType resolution
 - VariableType catalog with paginated listing API
-- Flyway-manated schema (baseline + normalization migration)
+- Flyway-managed schema (baseline + normalization migration)
 - H2 file-based persistence with HikariCP connection pooling
