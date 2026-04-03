@@ -4,3 +4,4 @@ This index links to per-entity API documentation:
 
 - [Experiments](API-experiment.md)
 - [Variable Types](API-variable-type.md)
+- [Trials](API-trial.md)

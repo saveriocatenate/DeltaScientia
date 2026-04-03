@@ -25,16 +25,16 @@ Configuration is stored in `openrouter.env`:
 Source `openrouter.env` before running the application to load environment variables.
 
 ## Development Conventions
-- Naming: - Java: PascalCase for classes (ExperimentService), camelCase for variables and methods.
-- Python: snake_case for scripts and functions.
-- Database: snake_case for table and column naming (managed via Flyway migrations).
-- Architecture: Standard Spring Boot Layered Architecture: Controller → Service → Repository → Entity.
-- Data Transfer: Strict use of DTOs (Data Transfer Objects) for communication between Backend and Frontend.
-- Boilerplate: Use Lombok (@Data, @Builder, @NoArgsConstructor, @AllArgsConstructor) to keep code clean.
-- Commit Messages: Follow Conventional Commits (e.g., feat: implement excel parsing, fix: h2 connection string).
-- Language: Code, Javadoc comments, and technical documentation must be in English. User-facing AI insights and logs may be in Italian if requested by the end-user.
-- Javadoc: Every new or modified class, method, and field must include Javadoc. Update existing Javadoc when changing signatures or behavior. Public and protected members are mandatory; package-private and private are encouraged for non-trivial logic.
-- Pre-commit: Before every commit, scan all untracked files against `.gitignore` for credentials, generated artifacts, IDE configs, and build output. Add missing patterns if any are found.
+- **Naming**: - Java: PascalCase for classes (ExperimentService), camelCase for variables and methods. Python: snake_case for scripts and functions. Database: snake_case for table and column naming (managed via Flyway migrations).
+- **Architecture**: Standard Spring Boot Layered Architecture: Controller → Service → Repository → Entity.
+- **Single Responsibility Principle**: Each service owns exactly one domain. If TrialService needs to read experiment data, it calls ExperimentService methods — it never injects ExperimentRepository directly. Only the owning service injects its repository.
+- **DTO mapping via Mappers**: All DTO ↔ Entity construction and response mapping lives in dedicated Mapper classes under `mapper/`. Service orchestration methods must not contain builder() chains. Create a new Mapper whenever a DTO conversion is needed. Mapper classes must be static utility classes: all methods are `static`, the class is `final`, the private constructor throws `UnsupportedOperationException`. Mappers are never injected via `@Component` or `@RequiredArgsConstructor` — call them as `MapperName.method()`.
+- **Data Transfer**: Strict use of DTOs for communication between Backend and Frontend.
+- **Boilerplate**: Use Lombok (@Data, @Builder, @NoArgsConstructor, @AllArgsConstructor) to keep code clean.
+- **Commit Messages**: Follow Conventional Commits (e.g., feat: implement excel parsing, fix: h2 connection string).
+- **Language**: Code, Javadoc comments, and technical documentation must be in English. User-facing AI insights and logs may be in Italian if requested by the end-user.
+- **Javadoc**: Every new or modified class, method, and field must include Javadoc. Update existing Javadoc when changing signatures or behavior. Public and protected members are mandatory; package-private and private are encouraged for non-trivial logic.
+- **Pre-commit**: Before every commit, scan all untracked files against `.gitignore` for credentials, generated artifacts, IDE configs, and build output. Add missing patterns if any are found.
 
 ## Critical Paths
 - Documentation: `documentation/` (per-entity API contracts, ER diagrams)

@@ -2,10 +2,10 @@ package it.deltascientia.service;
 
 import it.deltascientia.dto.ExperimentCreateRequest;
 import it.deltascientia.dto.ExperimentResponse;
-import it.deltascientia.model.VariableType;
-import it.deltascientia.service.VariableTypeService.ResolvedVariable;
 import it.deltascientia.mapper.ExperimentMapper;
+import it.deltascientia.model.VariableType;
 import it.deltascientia.repository.ExperimentRepository;
+import it.deltascientia.service.VariableTypeService.ResolvedVariable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExperimentService {
 
     private final ExperimentRepository experimentRepository;
-    private final ExperimentMapper experimentMapper;
     private final VariableTypeService variableTypeService;
 
     /**
@@ -46,10 +45,10 @@ public class ExperimentService {
 
         log.info("Resolved {} variables for experiment: name={}", resolvedVars.size(), request.name());
 
-        var experiment = experimentMapper.toEntity(request, resolvedVars);
+        var experiment = ExperimentMapper.toEntity(request, resolvedVars);
         var saved = experimentRepository.save(experiment);
         log.info("Experiment created with id={}", saved.getId());
-        return experimentMapper.toResponse(saved);
+        return ExperimentMapper.toResponse(saved);
     }
 
     /**
@@ -63,7 +62,7 @@ public class ExperimentService {
     public ExperimentResponse getById(Long id) {
         var experiment = experimentRepository.findById(id)
                 .orElseThrow(() -> new ExperimentNotFoundException(id));
-        return experimentMapper.toResponse(experiment);
+        return ExperimentMapper.toResponse(experiment);
     }
 
     /**
