@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Temperature",
+    "unitOfMeasure": "°C",
+    "dataType": "NUMERIC",
+    "description": "Ambient or controlled environment temperature"
+  },
+  {
+    "name": "pH Level",
+    "unitOfMeasure": "pH",
+    "dataType": "NUMERIC",
+    "description": "Acidity or alkalinity of a solution"
+  },
+  {
+    "name": "Pressure",
+    "unitOfMeasure": "atm",
+    "dataType": "NUMERIC",
+    "description": "Atmospheric or applied pressure"
+  },
+  {
+    "name": "Concentration",
+    "unitOfMeasure": "mol/L",
+    "dataType": "NUMERIC",
+    "description": "Solute concentration in solution"
+  },
+  {
+    "name": "Volume",
+    "unitOfMeasure": "mL",
+    "dataType": "NUMERIC",
+    "description": "Liquid or gas volume measurement"
+  },
+  {
+    "name": "Mass",
+    "unitOfMeasure": "g",
+    "dataType": "NUMERIC",
+    "description": "Sample mass or weight"
+  },
+  {
+    "name": "Time",
+    "unitOfMeasure": "min",
+    "dataType": "NUMERIC",
+    "description": "Elapsed time or duration"
+  },
+  {
+    "name": "Yield",
+    "unitOfMeasure": "%",
+    "dataType": "NUMERIC",
+    "description": "Reaction or process yield percentage"
+  },
+  {
+    "name": "Observations",
+    "unitOfMeasure": null,
+    "dataType": "TEXT",
+    "description": "Free-form qualitative observations"
+  }
+]
