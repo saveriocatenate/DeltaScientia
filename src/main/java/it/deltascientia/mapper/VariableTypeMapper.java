@@ -1,7 +1,7 @@
 package it.deltascientia.mapper;
 
 import it.deltascientia.dto.VariableTypeResponse;
-import it.deltascientia.dto.VariableTypeResponse.VariableTypeSummary;
+import it.deltascientia.dto.VariableTypeSummary;
 import it.deltascientia.model.VariableType;
 
 import java.util.List;

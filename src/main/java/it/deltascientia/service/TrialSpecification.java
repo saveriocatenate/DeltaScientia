@@ -1,7 +1,7 @@
 package it.deltascientia.service;
 
 import it.deltascientia.dto.TrialSearchRequest;
-import it.deltascientia.dto.TrialSearchRequest.VariableValueFilter;
+import it.deltascientia.dto.VariableValueFilter;
 import it.deltascientia.model.Trial;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
@@ -97,7 +97,12 @@ public final class TrialSpecification {
             }
 
             // De-duplicate results when multiple joins match
-            query.distinct(true);
+            if (predicates.isEmpty()) {
+                return cb.conjunction();
+            }
+            if (query != null) {
+                query.distinct(true);
+            }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

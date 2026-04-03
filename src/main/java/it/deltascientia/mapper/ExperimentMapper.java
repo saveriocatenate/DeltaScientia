@@ -2,9 +2,11 @@ package it.deltascientia.mapper;
 
 import it.deltascientia.dto.ExperimentCreateRequest;
 import it.deltascientia.dto.ExperimentResponse;
+import it.deltascientia.dto.ExperimentTrialSummary;
+import it.deltascientia.dto.ExperimentVariableSummary;
 import it.deltascientia.model.Experiment;
 import it.deltascientia.model.Variable;
-import it.deltascientia.service.VariableTypeService.ResolvedVariable;
+import it.deltascientia.service.ResolvedVariable;
 
 import java.util.List;
 
@@ -69,7 +71,7 @@ public final class ExperimentMapper {
                 .variables(experiment.getVariables().stream()
                         .map(v -> {
                             var type = v.getVariableType();
-                            return ExperimentResponse.VariableSummary.builder()
+                            return ExperimentVariableSummary.builder()
                                     .id(v.getId())
                                     .name(type.getName())
                                     .unitOfMeasure(type.getUnitOfMeasure())
@@ -79,7 +81,7 @@ public final class ExperimentMapper {
                         })
                         .toList())
                 .trials(experiment.getTrials().stream()
-                        .map(t -> ExperimentResponse.TrialSummary.builder()
+                        .map(t -> ExperimentTrialSummary.builder()
                                 .id(t.getId())
                                 .trialNumber(t.getTrialNumber())
                                 .label(t.getLabel())

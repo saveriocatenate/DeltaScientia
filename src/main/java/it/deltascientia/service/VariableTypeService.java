@@ -1,6 +1,7 @@
 package it.deltascientia.service;
 
 import it.deltascientia.dto.VariableTypeResponse;
+import it.deltascientia.dto.VariableTypeSummary;
 import it.deltascientia.mapper.VariableTypeMapper;
 import it.deltascientia.model.VariableType;
 import it.deltascientia.repository.VariableTypeRepository;
@@ -23,7 +24,6 @@ import java.util.List;
 public class VariableTypeService {
 
     private final VariableTypeRepository variableTypeRepository;
-    private final VariableTypeMapper variableTypeMapper;
 
     /**
      * Resolves a variable type from the given name or typeName.
@@ -59,13 +59,29 @@ public class VariableTypeService {
                 .orElseGet(() -> {
                     log.info("Creating new custom variable type: name={}, dataType={}, unitOfMeasure={}",
                             name, dataType != null ? dataType : "TEXT", unitOfMeasure);
-                    VariableType newType = variableTypeMapper.toNewEntity(name, unitOfMeasure,
+                    VariableType newType = VariableTypeMapper.toNewEntity(name, unitOfMeasure,
                             dataType != null ? dataType : "TEXT", description, true);
                     return variableTypeRepository.save(newType);
                 });
     }
 
-    public record ResolvedVariable(VariableType type) {}
+    /**
+     * Deletes a variable type by its database identifier.
+     *
+     * @param id the variable type ID
+     * @throws IllegalArgumentException if the type does not exist
+     */
+    @Transactional
+    public void deleteById(Long id) {
+        log.info("Deleting variable type: id={}", id);
+        var type = variableTypeRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Variable type not found for deletion: id={}", id);
+                    return new IllegalArgumentException("Variable type not found with id: " + id);
+                });
+        variableTypeRepository.delete(type);
+        log.info("Variable type deleted: id={}", id);
+    }
 
     /**
      * Lists all variable types with pagination support, ordered by name.
@@ -74,10 +90,10 @@ public class VariableTypeService {
     public VariableTypeResponse listAll(Pageable pageable) {
         log.debug("Listing variable types: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
         Page<VariableType> page = variableTypeRepository.findAll(pageable);
-        List<VariableTypeResponse.VariableTypeSummary> summaries = page.getContent().stream()
-                .map(variableTypeMapper::toSummary)
+        List<VariableTypeSummary> summaries = page.getContent().stream()
+                .map(VariableTypeMapper::toSummary)
                 .toList();
-        return variableTypeMapper.toResponse(summaries, page.getNumber(), page.getSize(),
+        return VariableTypeMapper.toResponse(summaries, page.getNumber(), page.getSize(),
                 page.getTotalElements(), page.getTotalPages(), page.isLast());
     }
 }

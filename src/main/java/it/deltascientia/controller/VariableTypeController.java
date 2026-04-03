@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller exposing VariableType catalog endpoints.
@@ -32,5 +30,17 @@ public class VariableTypeController {
             @PageableDefault(page = 0, size = 20, sort = "name") Pageable pageable) {
         VariableTypeResponse response = variableTypeService.listAll(pageable);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Deletes a variable type by its database identifier.
+     *
+     * @param id the variable type ID
+     * @return 204 No Content on success, or 400 if not found
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVariableType(@PathVariable Long id) {
+        variableTypeService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

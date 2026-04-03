@@ -64,6 +64,19 @@ Retrieves a single trial with its measured values.
 
 ---
 
+### Delete Trial
+
+Deletes a trial by its ID. All measured values are also removed via cascade.
+
+- **HTTP Method**: `DELETE`
+- **Path**: `/api/experiments/{experimentId}/trials/{trialId}`
+
+**Response — 204 No Content**: Trial deleted successfully.
+
+**Response — 404 Not Found**: Trial does not exist or does not belong to the experiment.
+
+---
+
 ### Search Trials
 
 Finds trials within an experiment with composite filtering on metadata, execution date, and multiple variable values. Uses **POST with JSON body** because filters are structured and may contain nested arrays.
@@ -168,9 +181,9 @@ Each filter targets a specific VariableType and joins against `trial_value`. Mul
 | `notes` | `string` | Free-form observations |
 | `executionDate` | `timestamp` | When the trial was executed |
 | `createdAt` | `timestamp` | Creation timestamp |
-| `values` | `ValueSummary[]` | Array of measured values |
+| `values` | `TrialValueSummary[]` | Array of measured values |
 
-### ValueSummary
+### TrialValueSummary
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -180,3 +193,22 @@ Each filter targets a specific VariableType and joins against `trial_value`. Mul
 | `valueText` | `string` | Short textual value |
 | `valueNumeric` | `double` | Numeric measurement value |
 | `valueLongText` | `string` | Extended observations |
+
+---
+
+### List Trials
+
+Returns a paginated list of all trials for an experiment, ordered by ID.
+
+- **HTTP Method**: `GET`
+- **Path**: `/api/experiments/{experimentId}/trials`
+
+**Query Parameters**:
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | `int` | `0` | Page number (0-based) |
+| `size` | `int` | `20` | Items per page |
+| `sort` | `string` | `id` | Sort field |
+
+**Response — 200 OK**: Same paginated structure as the Search Trials response.

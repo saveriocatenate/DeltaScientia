@@ -2,6 +2,51 @@
 
 ## Endpoints
 
+### List Experiments
+
+Returns a paginated list of all experiments, ordered by ID.
+
+- **HTTP Method**: `GET`
+- **Path**: `/api/experiments`
+
+**Query Parameters**:
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `page` | `int` | `0` | Page number (0-based) |
+| `size` | `int` | `20` | Items per page |
+| `sort` | `string` | `name` | Sort field |
+
+**Response — 200 OK**:
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "name": "Temperature Study Q1",
+      "description": "Analysis of temperature effects on catalyst A",
+      "category": "thermodynamics",
+      "status": "ACTIVE",
+      "createdBy": "john.doe",
+      "notes": "First batch of trials completed",
+      "createdAt": "2025-04-01T10:00:00Z",
+      "updatedAt": "2025-04-02T14:30:00Z",
+      "variables": [
+        { "id": 1, "name": "Temperature", "unitOfMeasure": "°C", "dataType": "NUMERIC", "description": "Ambient temperature" }
+      ],
+      "trials": []
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 1,
+  "totalPages": 1,
+  "last": true
+}
+```
+
+---
+
 ### Get Experiment by ID
 
 Retrieves all information for a specific experiment, including its variables and trials.
@@ -42,6 +87,20 @@ Retrieves all information for a specific experiment, including its variables and
   "id": 999
 }
 ```
+
+---
+
+### Delete Experiment
+
+Deletes an experiment by its ID. All nested trials and variables are also removed via cascade.
+
+- **HTTP Method**: `DELETE`
+- **Path**: `/api/experiments/{id}`
+- **Path Variable**: `id` (Long) — experiment ID
+
+**Response — 204 No Content**: Experiment deleted successfully.
+
+**Response — 404 Not Found**: Experiment does not exist.
 
 ---
 

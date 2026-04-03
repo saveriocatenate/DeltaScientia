@@ -50,6 +50,20 @@ Returns a paginated list of all variable types in the catalog (both standard and
 }
 ```
 
+---
+
+### Delete Variable Type
+
+Deletes a variable type by its database identifier.
+
+- **HTTP Method**: `DELETE`
+- **Path**: `/api/variable-types/{id}`
+- **Path Variable**: `id` (Long) — variable type ID
+
+**Response — 204 No Content**: Variable type deleted successfully.
+
+**Response — 400 Bad Request**: Variable type does not exist.
+
 ## Response Schema: VariableTypeResponse
 
 | Field | Type | Description |

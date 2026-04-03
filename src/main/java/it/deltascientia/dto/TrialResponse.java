@@ -26,25 +26,5 @@ public record TrialResponse(
         String notes,
         Instant executionDate,
         Instant createdAt,
-        List<ValueSummary> values
-) {
-    /**
-     * Summary of a single measured value within a trial.
-     *
-     * @param id            value database identifier
-     * @param variableId    the variable this value belongs to
-     * @param variableName  the variable type name
-     * @param valueText     textual value
-     * @param valueNumeric  numeric value
-     * @param valueLongText long-form observations
-     */
-    @Builder
-    public record ValueSummary(
-            Long id,
-            Long variableId,
-            String variableName,
-            String valueText,
-            Double valueNumeric,
-            String valueLongText
-    ) {}
-}
+        List<TrialValueSummary> values
+) {}

@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,20 +21,4 @@ public interface VariableTypeRepository extends JpaRepository<VariableType, Long
      */
     @Query("SELECT vt FROM VariableType vt WHERE LOWER(vt.name) = LOWER(:name)")
     Optional<VariableType> findByNameIgnoreCase(@Param("name") String name);
-
-    /**
-     * Finds all standard (non-custom) types, ordered by name.
-     *
-     * @return list of catalog variable types
-     */
-    @Query("SELECT vt FROM VariableType vt WHERE vt.isCustom = false ORDER BY vt.name")
-    List<VariableType> findStandardTypes();
-
-    /**
-     * Finds all types, including custom user-defined ones, ordered by name.
-     *
-     * @return list of all variable types
-     */
-    @Query("SELECT vt FROM VariableType vt ORDER BY vt.name")
-    List<VariableType> findAllOrderedByName();
 }

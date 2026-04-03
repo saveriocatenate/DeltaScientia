@@ -1,12 +1,15 @@
 package it.deltascientia.exception;
 
-import it.deltascientia.service.ExperimentService.ExperimentNotFoundException;
+import it.deltascientia.exception.model.ErrorResponse;
+import it.deltascientia.exception.model.ExperimentNotFoundException;
+import it.deltascientia.exception.model.FieldError;
+import it.deltascientia.exception.model.TrialNotFoundException;
+import it.deltascientia.exception.model.ValidationErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
 
 /**
  * Global exception handler that maps application exceptions to HTTP response codes.
@@ -18,11 +21,22 @@ public class GlobalExceptionHandler {
      * Handles cases where an experiment is not found, returning HTTP 404.
      *
      * @param ex the experiment-not-found exception
-     * @return 404 Not Found with empty body
+     * @return 404 Not Found with error details
      */
     @ExceptionHandler(ExperimentNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleExperimentNotFound(ExperimentNotFoundException ex) {
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(404).body(new ErrorResponse(ex.getMessage(), null));
+    }
+
+    /**
+     * Handles cases where a trial is not found, returning HTTP 404.
+     *
+     * @param ex the trial-not-found exception
+     * @return 404 Not Found with error details
+     */
+    @ExceptionHandler(TrialNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTrialNotFound(TrialNotFoundException ex) {
+        return ResponseEntity.status(404).body(new ErrorResponse(ex.getMessage(), null));
     }
 
     /**
@@ -39,8 +53,4 @@ public class GlobalExceptionHandler {
                 .toList();
         return ResponseEntity.badRequest().body(new ValidationErrorResponse(errors));
     }
-
-    private record ErrorResponse(String error, Long id) {}
-    private record ValidationErrorResponse(List<FieldError> details) {}
-    private record FieldError(String field, String message) {}
 }

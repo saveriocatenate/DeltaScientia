@@ -6,7 +6,6 @@ import it.deltascientia.dto.TrialSearchRequest;
 import it.deltascientia.mapper.TrialMapper;
 import it.deltascientia.model.Trial;
 import it.deltascientia.repository.TrialRepository;
-import it.deltascientia.service.ExperimentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,8 +33,8 @@ public class TrialService {
      * @param experimentId the parent experiment ID
      * @param request      the trial creation request
      * @return the persisted trial as a response DTO
-     * @throws ExperimentService.ExperimentNotFoundException if experiment doesn't exist
-     * @throws IllegalArgumentException                     if a referenced variable doesn't belong to the experiment
+     * @throws it.deltascientia.exception.model.ExperimentNotFoundException if experiment doesn't exist
+     * @throws IllegalArgumentException if a referenced variable doesn't belong to the experiment
      */
     @Transactional
     public TrialResponse create(Long experimentId, TrialCreateRequest request) {
@@ -62,19 +61,33 @@ public class TrialService {
     }
 
     /**
+     * Lists all trials for an experiment with pagination support, ordered by ID.
+     *
+     * @param experimentId the parent experiment ID
+     * @param pageable     pagination parameters
+     * @return paginated trial responses
+     */
+    @Transactional(readOnly = true)
+    public Page<TrialResponse> listAll(Long experimentId, Pageable pageable) {
+        log.debug("Listing trials for experiment: id={}, page={}, size={}", experimentId, pageable.getPageNumber(), pageable.getPageSize());
+        return trialRepository.findByExperimentIdOrderById(experimentId, pageable)
+                .map(trial -> TrialMapper.toResponse(trial, experimentId));
+    }
+
+    /**
      * Retrieves a single trial by its ID within the context of an experiment.
      *
      * @param experimentId the parent experiment ID
      * @param trialId      the trial ID
      * @return the trial response DTO
-     * @throws TrialNotFoundException if the trial doesn't exist or doesn't belong to the experiment
+     * @throws it.deltascientia.exception.model.TrialNotFoundException if the trial doesn't exist or doesn't belong to the experiment
      */
     @Transactional(readOnly = true)
     public TrialResponse getById(Long experimentId, Long trialId) {
         log.debug("Retrieving trial: trialId={}, experimentId={}", trialId, experimentId);
         Trial trial = trialRepository.findByIdAndExperimentId(trialId, experimentId)
-                .orElseThrow(() -> new TrialNotFoundException(trialId, experimentId));
-        return trialMapper.toResponse(trial, experimentId);
+                .orElseThrow(() -> new it.deltascientia.exception.model.TrialNotFoundException(trialId, experimentId));
+        return TrialMapper.toResponse(trial, experimentId);
     }
 
     /**
@@ -95,15 +108,22 @@ public class TrialService {
 
         var spec = TrialSpecification.matchesFilters(experimentId, request);
         return trialRepository.findAll(spec, pageable)
-                .map(trial -> trialMapper.toResponse(trial, experimentId));
+                .map(trial -> TrialMapper.toResponse(trial, experimentId));
     }
 
     /**
-     * Exception thrown when a trial cannot be found within an experiment.
+     * Deletes a trial by its ID within the context of an experiment.
+     *
+     * @param experimentId the parent experiment ID
+     * @param trialId      the trial ID
+     * @throws it.deltascientia.exception.model.TrialNotFoundException if the trial doesn't exist or doesn't belong to the experiment
      */
-    public static class TrialNotFoundException extends RuntimeException {
-        public TrialNotFoundException(Long trialId, Long experimentId) {
-            super("Trial not found with id " + trialId + " in experiment " + experimentId);
-        }
+    @Transactional
+    public void deleteById(Long experimentId, Long trialId) {
+        log.info("Deleting trial: trialId={}, experimentId={}", trialId, experimentId);
+        Trial trial = trialRepository.findByIdAndExperimentId(trialId, experimentId)
+                .orElseThrow(() -> new it.deltascientia.exception.model.TrialNotFoundException(trialId, experimentId));
+        trialRepository.delete(trial);
+        log.info("Trial deleted: trialId={}", trialId);
     }
 }

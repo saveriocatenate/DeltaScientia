@@ -1,10 +1,9 @@
 package it.deltascientia.service;
 
-import it.deltascientia.dto.TrialCreateRequest.TrialValueRequest;
+import it.deltascientia.dto.TrialValueRequest;
 import it.deltascientia.model.Trial;
 import it.deltascientia.model.TrialValue;
 import it.deltascientia.model.Variable;
-import it.deltascientia.service.VariableService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

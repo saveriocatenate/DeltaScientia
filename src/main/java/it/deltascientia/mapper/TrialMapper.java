@@ -2,7 +2,7 @@ package it.deltascientia.mapper;
 
 import it.deltascientia.dto.TrialCreateRequest;
 import it.deltascientia.dto.TrialResponse;
-import it.deltascientia.dto.TrialResponse.ValueSummary;
+import it.deltascientia.dto.TrialValueSummary;
 import it.deltascientia.model.Trial;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public final class TrialMapper {
      */
     public static TrialResponse toResponse(Trial trial, Long experimentId) {
         var values = trial.getValues().stream()
-                .map(tv -> ValueSummary.builder()
+                .map(tv -> TrialValueSummary.builder()
                         .id(tv.getId())
                         .variableId(tv.getVariable().getId())
                         .variableName(tv.getVariable().getVariableType().getName())

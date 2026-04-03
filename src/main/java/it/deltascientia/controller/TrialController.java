@@ -37,6 +37,21 @@ public class TrialController {
     }
 
     /**
+     * Retrieves all trials for an experiment, ordered by ID.
+     *
+     * @param experimentId the parent experiment
+     * @param pageable     pagination parameters
+     * @return 200 OK with paginated trial data
+     */
+    @GetMapping
+    public ResponseEntity<Page<TrialResponse>> listTrials(
+            @PathVariable Long experimentId,
+            @PageableDefault(size = 20) Pageable pageable) {
+        Page<TrialResponse> page = trialService.listAll(experimentId, pageable);
+        return ResponseEntity.ok(page);
+    }
+
+    /**
      * Retrieves a single trial by ID.
      *
      * @param experimentId the parent experiment
@@ -66,5 +81,19 @@ public class TrialController {
             @PageableDefault(size = 20) Pageable pageable) {
         Page<TrialResponse> page = trialService.search(experimentId, request, pageable);
         return ResponseEntity.ok(page);
+    }
+
+    /**
+     * Deletes a trial by ID.
+     *
+     * @param experimentId the parent experiment
+     * @param trialId      the trial identifier
+     * @return 204 No Content on success, or 404 if not found
+     */
+    @DeleteMapping("/{trialId}")
+    public ResponseEntity<Void> deleteTrial(@PathVariable Long experimentId,
+                                            @PathVariable Long trialId) {
+        trialService.deleteById(experimentId, trialId);
+        return ResponseEntity.noContent().build();
     }
 }
