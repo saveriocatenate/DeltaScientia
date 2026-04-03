@@ -1,6 +1,5 @@
--- Database schema for Delta Scientia
--- H2 DDL (Spring Boot ddl-auto=update handles this automatically,
--- this file serves as reference and can be used with spring.sql.init.mode=always)
+-- Baseline schema for Delta Scientia.
+-- Uses IF NOT EXISTS for idempotency on databases that already have tables.
 
 CREATE TABLE IF NOT EXISTS variable_type (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

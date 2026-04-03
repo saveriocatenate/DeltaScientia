@@ -1,19 +1,15 @@
 package it.deltascientia.service;
 
 import it.deltascientia.dto.ExperimentCreateRequest;
-import it.deltascientia.dto.ExperimentCreateRequest.VariableRequest;
 import it.deltascientia.dto.ExperimentResponse;
-import it.deltascientia.mapper.ExperimentMapper;
 import it.deltascientia.model.VariableType;
+import it.deltascientia.service.VariableTypeService.ResolvedVariable;
+import it.deltascientia.mapper.ExperimentMapper;
 import it.deltascientia.repository.ExperimentRepository;
-import it.deltascientia.repository.VariableTypeRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Business logic layer for Experiment operations.
@@ -21,57 +17,38 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExperimentService {
 
     private final ExperimentRepository experimentRepository;
     private final ExperimentMapper experimentMapper;
-    private final VariableTypeRepository variableTypeRepository;
+    private final VariableTypeService variableTypeService;
 
     /**
      * Creates a new experiment from the given request payload.
-     * For each variable in the request:
-     * <ul>
-     *   <li>If {@code typeName} is provided, looks up the existing type (case-insensitive).</li>
-     *   <li>If only {@code name} is provided, creates a new {@link VariableType}
-     *       in the catalog and links it.</li>
-     * </ul>
+     * Delegates variable type resolution to {@link VariableTypeService}.
      *
      * @param request the creation request
      * @return the persisted experiment as a response DTO
      */
     @Transactional
     public ExperimentResponse create(ExperimentCreateRequest request) {
-        List<ResolvedVariable> resolvedVars = new ArrayList<>();
+        log.info("Creating experiment: name={}", request.name());
 
-        for (VariableRequest varReq : request.variables()) {
-            if (varReq.typeName() != null) {
-                VariableType type = variableTypeRepository.findByNameIgnoreCase(varReq.typeName())
-                        .orElseThrow(() -> new IllegalArgumentException(
-                                "Variable type '" + varReq.typeName() + "' not found in catalog"));
-                resolvedVars.add(ResolvedVariable.builder().type(type)
-                        .unitOfMeasure(varReq.unitOfMeasure()).dataType(varReq.dataType()).description(varReq.description()).build());
-            } else if (varReq.name() != null) {
-                VariableType existingType = variableTypeRepository.findByNameIgnoreCase(varReq.name()).orElse(null);
-                if (existingType != null) {
-                    resolvedVars.add(ResolvedVariable.builder().type(existingType)
-                            .unitOfMeasure(varReq.unitOfMeasure()).dataType(varReq.dataType()).description(varReq.description()).build());
-                } else {
-                    VariableType newType = VariableType.builder()
-                            .name(varReq.name())
-                            .unitOfMeasure(varReq.unitOfMeasure())
-                            .dataType(varReq.dataType() != null ? varReq.dataType() : "TEXT")
-                            .description(varReq.description())
-                            .isCustom(true)
-                            .build();
-                    variableTypeRepository.save(newType);
-                    resolvedVars.add(ResolvedVariable.builder().type(newType)
-                            .unitOfMeasure(varReq.unitOfMeasure()).dataType(varReq.dataType()).description(varReq.description()).build());
-                }
-            }
-        }
+        var resolvedVars = request.variables().stream()
+                .map(varReq -> {
+                    log.debug("Resolving variable: typeName={}, name={}", varReq.typeName(), varReq.name());
+                    VariableType type = variableTypeService.resolveFromRequest(varReq.typeName(),
+                            varReq.name(), varReq.unitOfMeasure(), varReq.dataType(), varReq.description());
+                    return new ResolvedVariable(type);
+                })
+                .toList();
+
+        log.info("Resolved {} variables for experiment: name={}", resolvedVars.size(), request.name());
 
         var experiment = experimentMapper.toEntity(request, resolvedVars);
         var saved = experimentRepository.save(experiment);
+        log.info("Experiment created with id={}", saved.getId());
         return experimentMapper.toResponse(saved);
     }
 
@@ -98,14 +75,4 @@ public class ExperimentService {
         }
     }
 
-    /**
-     * Holds a resolved variable type reference and any user-provided overrides.
-     */
-    @Builder
-    public record ResolvedVariable(
-            VariableType type,
-            String unitOfMeasure,
-            String dataType,
-            String description
-    ) {}
 }

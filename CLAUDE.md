@@ -11,6 +11,7 @@ DeltaScientia is an AI-powered research assistant designed to track, compare, an
 - Backend: Java 21, Spring Boot 3.4.1 (Maven)
 - Frontend: Python 3.14.3, Streamlit
 - Database: H2 Database (Embedded mode, file-based persistence)
+- Migrations: Flyway (schema management via `src/main/resources/db/migration/`)
 - AI: Google Gemini API tramite WebClient/Spring AI
 - Tunnel/Deploy: Pinggy (for remote access)
 
@@ -26,7 +27,7 @@ Source `openrouter.env` before running the application to load environment varia
 ## Development Conventions
 - Naming: - Java: PascalCase for classes (ExperimentService), camelCase for variables and methods.
 - Python: snake_case for scripts and functions.
-- Database: snake_case for table and column naming (managed via JPA).
+- Database: snake_case for table and column naming (managed via Flyway migrations).
 - Architecture: Standard Spring Boot Layered Architecture: Controller → Service → Repository → Entity.
 - Data Transfer: Strict use of DTOs (Data Transfer Objects) for communication between Backend and Frontend.
 - Boilerplate: Use Lombok (@Data, @Builder, @NoArgsConstructor, @AllArgsConstructor) to keep code clean.
@@ -36,21 +37,39 @@ Source `openrouter.env` before running the application to load environment varia
 - Pre-commit: Before every commit, scan all untracked files against `.gitignore` for credentials, generated artifacts, IDE configs, and build output. Add missing patterns if any are found.
 
 ## Critical Paths
-- Documentation: documentation/ (API contracts, ER diagrams)
-- JPA Entities: src/main/java/it/deltascientia/model/
-- Business Logic: src/main/java/it/deltascientia/service/
-- REST API Endpoints: src/main/java/it/deltascientia/controller/
-- Streamlit Dashboard: src/main/python/dashboard.py
-- Unit/Integration Tests: src/test/java/ (JUnit 5 + Mockito)
+- Documentation: `documentation/` (per-entity API contracts, ER diagrams)
+- Database Migrations: `src/main/resources/db/migration/`
+- JPA Entities: `src/main/java/it/deltascientia/model/`
+- Business Logic: `src/main/java/it/deltascientia/service/`
+- REST API Endpoints: `src/main/java/it/deltascientia/controller/`
+- DTOs: `src/main/java/it/deltascientia/dto/`
+- Unit/Integration Tests: `src/test/java/` (JUnit 5 + Mockito)
+
+## Architecture Notes
+
+### Variable Type Catalog
+- `Variable` is a normalized join table linking an Experiment to a `VariableType`. It contains no metadata fields (name, unit, dataType, description) — all derive from the linked `VariableType`.
+- `VariableTypeService` handles catalog operations: type resolution during experiment creation and paginated listing.
+- `VariableTypeCatalogService` bootstraps the seed catalog from `variable-types.json` on first startup.
+- Custom variable types can be created inline during experiment creation via the `name` field in `VariableRequest`.
+
+### API Documentation
+- One markdown file per entity under `documentation/` (e.g., `API-experiment.md`, `API-variable-type.md`).
+- `API.md` is an index linking to the per-entity docs.
+- `database-er-diagram.md` contains the Mermaid ER diagram.
 
 ## Guidelines & Constraints (What NOT to do)
 - No In-Memory DB: Never use H2 in-memory mode. Data must persist in a local file (e.g., ./data/deltascientia_db).
-- No Logic in Controllers: Excel parsing, delta calculations, and AI prompting logic must reside in the Service layer.
-- No Hardcoded Secrets: Never commit the Gemini API Key. Use environment variables or an ignored application.properties.
-- No Manual SQL: Rely on Spring Data JPA Query Methods. Use @Query only for complex analytical aggregations.
+- No Logic in Controllers: Business logic must reside in the Service layer.
+- No Hardcoded Secrets: Never commit API keys. Use environment variables.
+- No Manual SQL Outside Flyway: Schema changes must go through numbered Flyway migrations. Use Spring Data JPA Query Methods for data access. Use @Query only for complex analytical queries.
 - Test Coverage: Every new Service method must have a corresponding JUnit test case.
 - No Commit configuration: Never commit openrouter.env and settings.json file
 
 ## Project Status
 
-This repository is in early setup — no source code or build configuration has been committed yet.
+Active development phase. Core infrastructure in place:
+- Experiment CRUD with VariableType resolution
+- VariableType catalog with paginated listing API
+- Flyway-manated schema (baseline + normalization migration)
+- H2 file-based persistence with HikariCP connection pooling

@@ -34,10 +34,6 @@ erDiagram
         BIGINT id PK
         BIGINT experiment_id FK
         BIGINT variable_type_id FK
-        VARCHAR(255) name
-        VARCHAR(100) unit_of_measure
-        VARCHAR(50) data_type
-        VARCHAR(500) description
         TIMESTAMP created_at
     }
 

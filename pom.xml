@@ -42,6 +42,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Flyway Database Migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
         <!-- Spring AI - Google Gemini -->
         <!-- TODO: add back once correct artifact version is confirmed -->
 <!--

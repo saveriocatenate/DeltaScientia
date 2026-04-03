@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Defines a measurable variable within an {@link Experiment}.
- * Variables may reference a shared {@link VariableType} for
- * cross-experiment comparability, or define standalone properties.
+ * Links a {@link VariableType} to an {@link Experiment},
+ * enabling measurements to be recorded via {@link TrialValue} rows.
+ * All metadata (name, unit, data type, description) is derived from the type.
  */
 @Entity
 @Table(name = "variable")
@@ -35,29 +35,13 @@ public class Variable {
     private Experiment experiment;
 
     /**
-     * Optional reference to a catalog {@link VariableType}.
-     * Null when the variable is fully custom without a canonical type.
+     * Reference to a {@link VariableType} defining this variable's metadata.
+     * Every variable must belong to a type.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "variable_type_id")
+    @JoinColumn(name = "variable_type_id", nullable = false)
     @ToString.Exclude
     private VariableType variableType;
-
-    /** Human-readable variable name. Must not be blank. */
-    @Column(nullable = false, length = 255)
-    private String name;
-
-    /** Unit of measurement (e.g. "°C", "pH", "mg/mL"). */
-    @Column(name = "unit_of_measure", length = 100)
-    private String unitOfMeasure;
-
-    /** Declared data type for value categorisation (e.g. "NUMERIC", "TEXT"). */
-    @Column(name = "data_type", length = 50)
-    private String dataType;
-
-    /** Optional description of the variable's purpose. */
-    @Column(length = 500)
-    private String description;
 
     /** Timestamp of row creation, managed by Hibernate. */
     @CreationTimestamp

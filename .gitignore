@@ -39,3 +39,11 @@ data/
 
 # IDE run configurations
 .run/
+
+# Postman collections
+postman/
+.postman/
+
+# OS
+.DS_Store
+Thumbs.db

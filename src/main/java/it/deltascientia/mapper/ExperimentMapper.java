@@ -4,7 +4,7 @@ import it.deltascientia.dto.ExperimentCreateRequest;
 import it.deltascientia.dto.ExperimentResponse;
 import it.deltascientia.model.Experiment;
 import it.deltascientia.model.Variable;
-import it.deltascientia.service.ExperimentService.ResolvedVariable;
+import it.deltascientia.service.VariableTypeService.ResolvedVariable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -38,20 +38,9 @@ public class ExperimentMapper {
                 .build();
 
         for (ResolvedVariable resolved : resolvedVariables) {
-            String displayName = resolved.type().getName();
             Variable variable = Variable.builder()
                     .experiment(experiment)
                     .variableType(resolved.type())
-                    .name(displayName)
-                    .unitOfMeasure(resolved.unitOfMeasure() != null
-                            ? resolved.unitOfMeasure()
-                            : resolved.type().getUnitOfMeasure())
-                    .dataType(resolved.dataType() != null
-                            ? resolved.dataType()
-                            : resolved.type().getDataType())
-                    .description(resolved.description() != null
-                            ? resolved.description()
-                            : resolved.type().getDescription())
                     .build();
             experiment.getVariables().add(variable);
         }
@@ -78,13 +67,16 @@ public class ExperimentMapper {
                 .createdAt(experiment.getCreatedAt())
                 .updatedAt(experiment.getUpdatedAt())
                 .variables(experiment.getVariables().stream()
-                        .map(v -> ExperimentResponse.VariableSummary.builder()
-                                .id(v.getId())
-                                .name(v.getName())
-                                .unitOfMeasure(v.getUnitOfMeasure())
-                                .dataType(v.getDataType())
-                                .description(v.getDescription())
-                                .build())
+                        .map(v -> {
+                            var type = v.getVariableType();
+                            return ExperimentResponse.VariableSummary.builder()
+                                    .id(v.getId())
+                                    .name(type.getName())
+                                    .unitOfMeasure(type.getUnitOfMeasure())
+                                    .dataType(type.getDataType())
+                                    .description(type.getDescription())
+                                    .build();
+                        })
                         .collect(Collectors.toList()))
                 .trials(experiment.getTrials().stream()
                         .map(t -> ExperimentResponse.TrialSummary.builder()
